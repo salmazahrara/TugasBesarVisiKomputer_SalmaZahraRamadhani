@@ -1,0 +1,24 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("activity_log.csv")
+
+df = df[df["timestamp"] != "timestamp"]
+df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+df = df.dropna()
+
+df["hour"] = df["timestamp"].dt.hour
+
+summary = df.groupby(["hour", "status"]).size().unstack(fill_value=0)
+
+summary.plot(kind="bar", figsize=(12, 5))
+plt.title("Analisis Aktivitas Mahasiswa per Jam")
+plt.xlabel("Jam")
+plt.ylabel("Jumlah Aktivitas")
+plt.tight_layout()
+plt.show()
+
+if "Mengantuk" in summary:
+    sleepy = summary["Mengantuk"].idxmax()
+    print(f"⚠️ Jam rawan mengantuk: {sleepy}:00 – {sleepy+1}:00")
+    print("💡 Disarankan tidak belajar di jam ini.")
